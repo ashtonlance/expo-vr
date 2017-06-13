@@ -10,6 +10,10 @@ import {
   View,
 } from 'react-native';
 
+import videojs from 'video.js/dist/video.js';
+import panorama from 'videojs-panorama/dist/videojs-panorama.v5.js';
+
+
 import { MonoText } from '../components/StyledText';
 
 export default class HomeScreen extends React.Component {
@@ -18,67 +22,58 @@ export default class HomeScreen extends React.Component {
       visible: false,
     },
   };
+constructor(props){
+        super(props);
+        this.displayName = 'PanoramaVideoPlayer';
+        this.player = null;
+    }
+
+    initializePlayer(){
+        var { videoInfo } = this.props;
+        var videoElement = this.refs.player;
+        var isMobile = isMobileOrTablet();
+
+        this.player = videojs(videoElement, {},  () => {
+            window.addEventListener("resize", () => {
+                var canvas = this.player.getChild('Canvas');
+                if(canvas) canvas.handleResize();
+            });
+        });
+
+        this.player.poster(videoInfo.imageURL);
+        this.player.src({src: videoInfo.videoURL, type: "video/mp4" });
+
+        var width = videoElement.offsetWidth;
+        var height = videoElement.offsetHeight;
+        this.player.width(width), this.player.height(height);
+        panorama(this.player, {
+            clickToToggle: (!isMobile),
+            autoMobileOrientation: true,
+            initFov: 100,
+            VREnable: isMobile,
+            clickAndDrag: true,
+            NoticeMessage: (isMobile)? "please drag and drop the video" : "please use your mouse drag and drop the video"
+        });
+
+        this.player.on("VRModeOn", function(){
+            this.player.controlBar.fullscreenToggle.trigger("tap");
+        });
+    }
+
+    componentDidMount(){
+        this.initializePlayer();
+    }
 
   render() {
     return (
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}>
-
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={require('../assets/images/expo-wordmark.png')}
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>
-              Get started by opening
-            </Text>
-
-            <View
-              style={[
-                styles.codeHighlightContainer,
-                styles.homeScreenFilename,
-              ]}>
-              <MonoText style={styles.codeHighlightText}>
-                screens/HomeScreen.js
-              </MonoText>
-            </View>
-
-            <Text style={styles.getStartedText}>
-              Change that text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity
-              onPress={this._handleHelpPress}
-              style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>
-                Help, it didn’t automatically reload!
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>
-            This is a tab bar. You can edit it in:
-          </Text>
-
-          <View
-            style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>
-              navigation/RootNavigation.js
-            </MonoText>
-          </View>
-        </View>
-      </View>
+      <div className="panroama__video__player">
+                <div className="panroama__video__player__wrapper">
+                    <div className="panroama__video__player__container">
+                        <video className="video-js vjs-default-skin" crossOrigin="anonymous" controls ref="player">
+                        </video>
+                    </div>
+                </div>
+            </div>
     );
   }
 
@@ -138,11 +133,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeImage: {
-    width: 140,
-    height: 38,
+    width: 350,
+    height: 200,
     resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
+    marginTop: -40,
   },
   getStartedContainer: {
     alignItems: 'center',

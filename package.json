@@ -15,7 +15,9 @@
     "@expo/samples": "~1.0.3",
     "expo": "17.0.0",
     "react": "16.0.0-alpha.6",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-17.0.0.tar.gz"
+    "react-native": "https://github.com/expo/react-native/archive/sdk-17.0.0.tar.gz",
+    "video.js": "^6.1.0",
+    "videojs-panorama": "^0.1.6"
   },
   "devDependencies": {
     "jest-expo": "~1.0.1"
